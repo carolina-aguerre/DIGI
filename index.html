@@ -449,7 +449,7 @@ const SCHEMA_S2 = {
 const SCHEMA_S1 = {
   key:"s1",
   signature:/iniciativa nacional|secretar[ií]a o comit[eé]/i,
-  eyebrow:"Semana 1 · Instituciones y gobernanza de Internet",
+  eyebrow:"Semana 1.1 · Instituciones y gobernanza de Internet",
   wcTitle:"Iniciativas nacionales de gobernanza de Internet",
   accent:"#1c5680",
   lede:"Cada ficha releva una iniciativa nacional de gobernanza de Internet —su comité, financiamiento, ediciones y agenda—, con la lectura de cada participante sobre su modelo multistakeholder, su impacto y qué recomendaría.",
@@ -484,6 +484,41 @@ const SCHEMA_S1 = {
       sections:sections.filter(s=>s.value) };
   }
 };
+/* Semana 1.2: mapeo por tipo de iniciativa (marco de Radu, 2019).
+   Columnas (sin Timestamp): 0 nombre · 1 correo (NO se muestra) · 2 tipo · 3 nombre oficial ·
+   4 alcance · 5 inclusividad · 6 área · 7 mecanismos · 8 transparencia · 9 autonomía financiera ·
+   10 rendición de cuentas · 11 fecha de inicio · 12 comentarios */
+const SCHEMA_S12 = {
+  key:"s12",
+  signature:/tipo de iniciativa|radu/i,
+  eyebrow:"Semana 1.2 · Instituciones y gobernanza de Internet",
+  wcTitle:"Iniciativas de gobernanza por tipo y alcance",
+  accent:"#2b6f9e",
+  lede:"Cada ficha analiza una iniciativa de gobernanza de Internet según su tipo, su alcance y sus mecanismos de decisión, y evalúa su inclusividad (Radu, 2019), su transparencia y su autonomía.",
+  searchPh:"Buscar por iniciativa, participante o alcance…",
+  noun:"iniciativa", nounPl:"iniciativas",
+  isHeader:r=>/^nombre/i.test(clean(r[0]))&&/correo/i.test(clean(r[1])),
+  valid:r=>clean(r[0])&&clean(r[3]),
+  formValid:r=>clean(r[0])&&clean(r[3]),
+  parse(r){
+    const tags=[];
+    if(clean(r[2])) tags.push(clean(r[2]));
+    if(clean(r[5])) tags.push("Inclusividad: "+clean(r[5]));
+    const sections=[
+      sec("Tipo de iniciativa",r[2]),
+      sec("Área de gobernanza de Internet",r[6]),
+      sec("Mecanismos de toma de decisiones",clean(r[7]).split(/\s*,\s*/).filter(Boolean).join("\n")),
+      sec("Inclusividad de los actores (Radu, 2019)",r[5]),
+      sec("Transparencia en la publicación de documentos",r[8]),
+      sec("Autonomía financiera frente a los Estados",r[9]),
+      sec("Rendición de cuentas ante la comunidad global",r[10]),
+      sec("Fecha estimada de inicio",r[11]),
+      sec("Comentarios y conclusiones",r[12])
+    ];
+    return { country:clean(r[4])||"Sin alcance", title:clean(r[3]), author:clean(r[0]),
+      excerpt:clean(r[6])||clean(r[12]), tags, sections:sections.filter(s=>s.value) };
+  }
+};
 function committeeLabel(v){ return yes(v)?"Secretaría / comité de organización":"Organización"; }
 function intersessLabel(v){ return "Trabajo entre sesiones"; }
 function assocLabel(v){ return "Asociación con otros proyectos"; }
@@ -503,8 +538,10 @@ function edicionesBadge(v){
    semana a semana. Para sumar la Semana 3: crear su SCHEMA_S3 (copiando uno de
    los de arriba) y agregar la línea correspondiente acá. */
 const WEEKS = [
-  { key:"s1", tab:"Semana 1", sub:"Gobernanza de Internet", sheet:"Semana 1", gid:"1203663503", schema:SCHEMA_S1,
+  { key:"s1", tab:"Semana 1.1", sub:"Iniciativas nacionales", sheet:"Semana 1.1", gid:"1203663503", schema:SCHEMA_S1,
     lede:"las <b>iniciativas nacionales de gobernanza</b>" },
+  { key:"s12", tab:"Semana 1.2", sub:"Tipos de iniciativa", sheet:"Semana 1.2", gid:"1845337669", schema:SCHEMA_S12,
+    lede:"las <b>iniciativas de gobernanza por tipo y alcance</b>" },
   { key:"s2", tab:"Semana 2", sub:"Conectividad e inclusión", sheet:"Semana 2", gid:"445592752", schema:SCHEMA_S2,
     lede:"las <b>políticas de conectividad e inclusión</b>" }
 ];
@@ -569,7 +606,7 @@ function parseWeek(raw,schema){
   const items=[];
   rows.forEach(r=>{
     if(!r) return;
-    const ok = fromForm ? (clean(r[0])&&clean(r[2])) : schema.valid(r);
+    const ok = fromForm ? (schema.formValid ? schema.formValid(r) : (clean(r[0])&&clean(r[2]))) : schema.valid(r);
     if(!ok||schema.isHeader(r)) return;
     const it=schema.parse(r);
     it.cm=countryMeta(it.country);
