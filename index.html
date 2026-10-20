@@ -431,34 +431,39 @@ function isCountryish(raw){
 const sec=(label,value)=>({label,value:clean(value)});
 const srcSec=(label,value)=>({label,value:clean(value),kind:"sources"});
 
+/* Semana 2 (consigna Prof. Galperin). Columnas (sin Timestamp):
+   0 participante · 1 país · 2 iniciativa · 3 descripción · 4 población · 5 objetivos de largo plazo ·
+   6 tipo de intervención · 7 actores y financiamiento · 8 resultados y sostenibilidad · 9 enlaces ·
+   10 nombre de la propuesta · 11 descripción de la propuesta · 12 enlace de la propuesta */
 const SCHEMA_S2 = {
   key:"s2",
-  signature:/nombre de la pol[ií]tica|teor[ií]a del cambio/i,
+  signature:/objetivos de largo plazo|tipo de intervenci[oó]n/i,
   eyebrow:"Semana 2 · Infraestructura, conectividad y brechas",
-  wcTitle:"Políticas de conectividad e inclusión digital",
+  wcTitle:"Iniciativas para reducir la brecha digital",
   accent:"#087c8e",
-  lede:"Cada ficha es un policy brief: una política real de inclusión digital o conectividad, mapeada de punta a punta —población, teoría del cambio, actores, resultados—, con su reflexión a 10 años.",
-  searchPh:"Buscar por política, participante o país…",
-  noun:"política", nounPl:"políticas",
-  isHeader:r=>clean(r[0]).toLowerCase().startsWith("nombre")||clean(r[0]).toLowerCase().startsWith("semana"),
+  lede:"Cada ficha releva una iniciativa de escala significativa para reducir la brecha digital en alguna de sus dimensiones —infraestructura, acceso, habilidades o usos—: su población objetivo, sus actores y financiamiento, y sus resultados y sostenibilidad.",
+  searchPh:"Buscar por iniciativa, participante o país…",
+  noun:"iniciativa", nounPl:"iniciativas",
+  isHeader:r=>/^nombre del participante/i.test(clean(r[0]))||/^consigna/i.test(clean(r[0])),
   valid:r=>clean(r[0])&&clean(r[2])&&isCountryish(r[1]),
   parse(r){
-    const tags=[]; if(clean(r[10])) tags.push("+ propuesta regulatoria");
+    const tags=[];
+    const tipo=clean(r[6]); if(tipo&&tipo.length<=40) tags.push(tipo);
+    if(clean(r[10])) tags.push("+ propuesta");
     const sections=[
       sec("Descripción",r[3]),
-      srcSec("Fuentes",r[4]),
-      sec("Población objetivo",r[5]),
-      sec("Objetivos y teoría del cambio",r[6]),
-      sec("Tipo de intervención",r[7]),
-      sec("Actores involucrados y financiamiento",r[8]),
-      sec("Resultados y sostenibilidad",r[9])
+      sec("Población objetivo",r[4]),
+      sec("Objetivos de largo plazo",r[5]),
+      sec("Tipo de intervención",r[6]),
+      sec("Actores involucrados y financiamiento",r[7]),
+      sec("Resultados y sostenibilidad",r[8]),
+      srcSec("Enlaces relacionados",r[9])
     ];
-    if(clean(r[10])){
-      sections.push({label:"Segunda propuesta · regulación en escuelas",kind:"prop",
-        name:clean(r[10]),value:clean(r[11]),src:clean(r[12])});
+    if(clean(r[10])||clean(r[11])){
+      sections.push({label:"Propuesta",kind:"prop",name:clean(r[10]),value:clean(r[11]),src:clean(r[12])});
     }
     return { country:r[1], title:clean(r[2]), author:clean(r[0]),
-      excerpt:clean(r[3])||clean(r[6]), tags, sections:sections.filter(s=>s.value||s.kind==="prop") };
+      excerpt:clean(r[3])||clean(r[5]), tags, sections:sections.filter(s=>s.value||s.kind==="prop") };
   }
 };
 
@@ -558,8 +563,8 @@ const WEEKS = [
     lede:"las <b>iniciativas nacionales de gobernanza</b>" },
   { key:"s12", tab:"Semana 1.2", sub:"Tipos de iniciativa", sheet:"Semana 1.2", gid:"1845337669", schema:SCHEMA_S12,
     lede:"las <b>iniciativas de gobernanza por tipo y alcance</b>" },
-  { key:"s2", tab:"Semana 2", sub:"Conectividad e inclusión", sheet:"Semana 2", gid:"445592752", schema:SCHEMA_S2,
-    lede:"las <b>políticas de conectividad e inclusión</b>" }
+  { key:"s2", tab:"Semana 2", sub:"Brecha digital", sheet:"Semana 2", gid:"512070192", schema:SCHEMA_S2,
+    lede:"las <b>iniciativas para reducir la brecha digital</b>" }
 ];
 let VISIBLE=[];
 
