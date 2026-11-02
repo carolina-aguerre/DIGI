@@ -29,6 +29,7 @@ El atlas se organiza por semanas del programa, y cada semana aparece recién cua
 | 1.1 | Iniciativas nacionales de gobernanza de Internet |
 | 1.2 | Iniciativas de gobernanza por tipo, alcance e inclusividad de actores |
 | 2 | Políticas de conectividad e inclusión digital |
+| 3 | Plataformas digitales y su gobernanza |
 
 Las fichas se pueden filtrar por país o alcance, y también buscar por nombre de la iniciativa o del participante.
 
