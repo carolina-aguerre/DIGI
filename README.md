@@ -2,7 +2,7 @@
 
 **DiGI · Diploma en Gobernanza de Internet — Edición 2026**
 
-Este atlas reúne el mapeo colaborativo que realizan los participantes de la DiGI durante el bloque virtual del programa. Cada ficha corresponde al análisis de una iniciativa, institución o política de gobernanza de Internet, relevada por un participante de la cohorte.
+Este atlas reúne el mapeo colaborativo que realizan los participantes de la DiGI durante el bloque virtual del programa. Cada ficha corresponde al análisis de una iniciativa, institución, plataforma o política de gobernanza de Internet, relevada por un participante o un grupo de la cohorte.
 
 El mapeo se construye semana a semana. Cada nueva entrega suma fichas al atlas y enciende un nuevo punto en el mapa. Así, la cohorte puede ver cómo crece el panorama regional a medida que avanza el programa.
 
@@ -28,10 +28,11 @@ El atlas se organiza por semanas del programa, y cada semana aparece recién cua
 |---|---|
 | 1.1 | Iniciativas nacionales de gobernanza de Internet |
 | 1.2 | Iniciativas de gobernanza por tipo, alcance e inclusividad de actores |
-| 2 | Políticas de conectividad e inclusión digital |
+| 2 | Iniciativas para reducir la brecha digital |
 | 3 | Plataformas digitales y su gobernanza |
+| 5 | Iniciativas de gobernanza de la inteligencia artificial |
 
-Las fichas se pueden filtrar por país o alcance, y también buscar por nombre de la iniciativa o del participante.
+Las fichas se pueden filtrar por país, por alcance (Semana 1.2) o por tipo de plataforma (Semana 3), y también buscar por nombre de la iniciativa, de la plataforma o del participante.
 
 ## Cómo funciona
 
@@ -46,9 +47,9 @@ El sitio es un único archivo, `index.html`, publicado con GitHub Pages. No usa 
 En la sección `CONFIG` del `index.html`:
 
 - `SHEET_ID`: ID de la planilla de respuestas.
-- `WEEKS`: lista de semanas, cada una con el `gid` de su pestaña en la planilla.
+- `WEEKS`: lista de semanas. Cada una se lee por el `gid` de su pestaña en la planilla o, si no tiene `gid`, por el nombre de la pestaña.
 
-Para agregar una nueva semana hay que sumar su esquema de columnas y una línea en `WEEKS` con el `gid` correspondiente.
+Para agregar una nueva semana hay que sumar su esquema de columnas y una línea en `WEEKS`. El atlas lee las columnas por posición, así que no conviene cambiar el orden de las preguntas de un formulario que ya está recibiendo respuestas; las preguntas nuevas se agregan al final.
 
 La planilla tiene que estar compartida como **"Cualquier persona con el enlace: Lector"** para que el sitio pueda leerla.
 
