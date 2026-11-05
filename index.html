@@ -602,6 +602,64 @@ const SCHEMA_S3 = {
       excerpt:clean(r[6])||clean(r[7]), tags, sections:sections.filter(s=>s.value||s.kind==="prop") };
   }
 };
+/* Semana 5: gobernanza de la IA. Columnas (sin Timestamp):
+   0 nombre · 1 iniciativa o instrumento · 2 actores que la impulsan · 3 mecanismos de gobernanza ·
+   4 infraestructuras de IA · 5 cooperación · 6 financiamiento · 7 desafíos y oportunidades ·
+   8 país (opcional: solo si se agrega esa pregunta al final del form)
+   Si no hay columna de país, se detecta en el nombre de la iniciativa y en los actores. */
+const COUNTRY_WORDS={
+  "Argentina":["argentina","argentino","argentinos","argentinas"],
+  "Brasil":["brasil","brazil","brasileno","brasilena","brasileiro","brasileira"],
+  "Uruguay":["uruguay","uruguayo","uruguaya"],
+  "Chile":["chile","chileno","chilena"],
+  "Colombia":["colombia","colombiano","colombiana"],
+  "México":["mexico","mexicano","mexicana"],
+  "Perú":["peru","peruano","peruana"],
+  "Ecuador":["ecuador","ecuatoriano","ecuatoriana"],
+  "Bolivia":["bolivia","boliviano","boliviana"],
+  "Paraguay":["paraguay","paraguayo","paraguaya"],
+  "Venezuela":["venezuela","venezolano","venezolana"],
+  "Costa Rica":["costa rica","costarricense"],
+  "Panamá":["panama","panameno","panamena"],
+  "República Dominicana":["republica dominicana","dominicano","dominicana"],
+  "Guatemala":["guatemala","guatemalteco","guatemalteca"],
+  "Honduras":["honduras","hondureno","hondurena"],
+  "El Salvador":["el salvador","salvadoreno","salvadorena"],
+  "Cuba":["cuba","cubano","cubana"],
+  "Trinidad y Tobago":["trinidad y tobago","trinidad"],
+  "Jamaica":["jamaica"]
+};
+function detectCountry(...texts){
+  const t=" "+texts.map(x=>(x||"")).join(" ").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9 ]+/g," ")+" ";
+  for(const c in COUNTRY_WORDS){ if(COUNTRY_WORDS[c].some(w=>t.includes(" "+w+" "))) return c; }
+  return "";
+}
+const SCHEMA_S5 = {
+  key:"s5",
+  signature:/infraestructuras de ia|mecanismos de gobernanza/i,
+  eyebrow:"Semana 5 · Inteligencia artificial y gobernanza de datos",
+  wcTitle:"Iniciativas de gobernanza de la IA",
+  accent:"#5a4fa8",
+  lede:"Cada ficha analiza una iniciativa o instrumento de gobernanza de la IA —una ley, una estrategia nacional, un proyecto de I+D—: quién la impulsa, con qué mecanismos e infraestructuras, cómo coopera con otros actores, quién la financia y qué desafíos y oportunidades abre.",
+  searchPh:"Buscar por iniciativa, participante o país…",
+  noun:"iniciativa", nounPl:"iniciativas",
+  isHeader:r=>/^nombre y apellido/i.test(clean(r[0]))&&/iniciativa/i.test(clean(r[1])),
+  valid:r=>clean(r[0])&&clean(r[1]),
+  formValid:r=>clean(r[0])&&clean(r[1]),
+  parse(r){
+    const country=clean(r[8])||detectCountry(r[1],r[2])||"Regional / otros";
+    const sections=[
+      sec("Actores que la impulsan",r[2]),
+      sec("Mecanismos de gobernanza",r[3]),
+      sec("Infraestructuras de IA",r[4]),
+      sec("Cooperación con otros actores",r[5]),
+      sec("Financiamiento",r[6]),
+      sec("Desafíos y oportunidades",r[7])
+    ];
+    return { country, title:clean(r[1]), author:clean(r[0]),
+      excerpt:clean(r[3])||clean(r[7]), tags:[], sections:sections.filter(s=>s.value) };
+  }
+};
 function committeeLabel(v){ return yes(v)?"Secretaría / comité de organización":"Organización"; }
 function intersessLabel(v){ return "Trabajo entre sesiones"; }
 function assocLabel(v){ return "Asociación con otros proyectos"; }
@@ -627,7 +685,9 @@ const WEEKS = [
   { key:"s2", tab:"Semana 2", sub:"Brecha digital", sheet:"Semana 2", gid:"512070192", schema:SCHEMA_S2,
     lede:"las <b>iniciativas para reducir la brecha digital</b>" },
   { key:"s3", tab:"Semana 3", sub:"Plataformas", sheet:"Semana 3", gid:"", schema:SCHEMA_S3,
-    lede:"las <b>plataformas digitales y su gobernanza</b>" }
+    lede:"las <b>plataformas digitales y su gobernanza</b>" },
+  { key:"s5", tab:"Semana 5", sub:"IA y datos", sheet:"Semana 5", gid:"1554001524", schema:SCHEMA_S5,
+    lede:"las <b>iniciativas de gobernanza de la IA</b>" }
 ];
 let VISIBLE=[];
 
