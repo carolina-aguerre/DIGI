@@ -160,8 +160,9 @@
     padding:3px 8px;border-radius:999px;white-space:nowrap}
 
   /* stagger de entrada */
-  .card{opacity:0;transform:translateY(10px);animation:rise .5s ease forwards}
-  @keyframes rise{to{opacity:1;transform:none}}
+  /* visibles por defecto: si la animación no corre (Chrome, reduced-motion), igual se ven */
+  .card{animation:rise .5s ease backwards}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}}
 
   /* ---------- STATES ---------- */
   .state{padding:70px 0;text-align:center;color:var(--ink-soft)}
